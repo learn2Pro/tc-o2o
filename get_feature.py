@@ -63,6 +63,130 @@ merchant_off_day_dis = dict()
 merchant_off_distance = dict()
 num = 0
 ###################################初始化#############################
+###################################online#############################
+for line in reader_on:
+    num += 1
+    if num == 1:
+        continue
+    if line[3] is not None and line[3] != "null" and line[4] is not None and line[4] == r"null" \
+            and line[6] is not None and line[6] != r"null":
+        if ":" not in line[4]:
+            rate = line[4]
+        else:
+            discount = line[4].split(":")
+            rate = float("%.2f" % (float(discount[1]) / float(discount[0])))
+        user_coupon_pair.add((line[0], line[1], line[3], rate, "null"))
+
+    ###########设置交互，click,get,buy (user,coupon,merchant)########
+    if line[6] is not None and line[6] != "null":
+        if (line[0], line[1]) is not None and line[1] != "null":
+            if (line[0], line[1]) not in user_merchant_buy:
+                user_merchant_buy[(line[0], line[1])] = 1
+            else:
+                user_merchant_buy[(line[0], line[1])] += 1
+        if line[0] not in user_buy:
+            user_buy[line[0]] = 1
+        else:
+            user_buy[line[0]] += 1
+        if line[1] not in merchant_buy:
+            merchant_buy[line[1]] = 1
+        else:
+            merchant_buy[line[1]] += 1
+    if line[2] == '0':
+        if line[3] is not None and line[3] != "null":
+            if (line[0], line[3]) not in user_coupon_click:
+                user_coupon_click[(line[0], line[3])] = 1
+            else:
+                user_coupon_click[(line[0], line[3])] += 1
+        if line[1] is not None and line[1] != "null":
+            if (line[0], line[1]) not in user_merchant_click:
+                user_merchant_click[(line[0], line[1])] = 1
+            else:
+                user_merchant_click[(line[0], line[1])] += 1
+        if line[0] not in user_click:
+            user_click[line[0]] = 1
+        else:
+            user_click[line[0]] += 1
+        if line[3] not in coupon_click:
+            coupon_click[line[3]] = 1
+        else:
+            coupon_click[line[3]] += 1
+        if line[1] not in merchant_click:
+            merchant_click[line[1]] = 1
+        else:
+            merchant_click[line[1]] += 1
+    elif line[2] == '1':
+        if line[3] is not None and line[3] != "null":
+            if (line[0], line[3]) not in user_coupon_buy:
+                user_coupon_buy[(line[0], line[3])] = 1
+            else:
+                user_coupon_buy[(line[0], line[3])] += 1
+            if line[3] not in coupon_buy:
+                coupon_buy[line[3]] = 1
+            else:
+                coupon_buy[line[3]] += 1
+    elif line[2] == '2':
+        if line[3] is not None and line[3] != "null":
+            if (line[0], line[3]) not in user_coupon_get:
+                user_coupon_get[(line[0], line[3])] = 1
+            else:
+                user_coupon_get[(line[0], line[3])] += 1
+        if (line[0], line[1]) is not None and line[1] != "null":
+            if (line[0], line[1]) not in user_merchant_get:
+                user_merchant_get[(line[0], line[1])] = 1
+            else:
+                user_merchant_get[(line[0], line[1])] += 1
+        if line[0] not in user_get:
+            user_get[line[0]] = 1
+        else:
+            user_get[line[0]] += 1
+        if line[3] not in coupon_get:
+            coupon_get[line[3]] = 1
+        else:
+            coupon_get[line[3]] += 1
+        if line[1] not in merchant_get:
+            merchant_get[line[1]] = 1
+        else:
+            merchant_get[line[1]] += 1
+            ###########设置优惠力度(user,coupon,merchant)########
+    if line[4] is not None and line[4] != r"null":
+        if ":" not in line[4]:
+            rate = line[4]
+        else:
+            discount = line[4].split(":")
+            rate = float("%.2f" % (float(discount[1]) / float(discount[0])))
+        if (line[3], rate) not in coupon_discount_rate:
+            coupon_discount_rate[(line[3], rate)] = 1
+        else:
+            coupon_discount_rate[(line[3], rate)] += 1
+        if line[6] is not None and line[6] != r"null":
+            if (line[0], line[3], rate) not in user_coupon_discount_rate:
+                user_coupon_discount_rate[(line[0], line[3], rate)] = 1
+            else:
+                user_coupon_discount_rate[(line[0], line[3], rate)] += 1
+    if (line[5] is not None and line[5] != r"null") and (line[6] is not None and line[6] != r"null"):
+        day_dis = (int(line[6][4:6]) - int(line[5][4:6])) * 30 + (int(line[6][6:]) - int(line[5][6:]))
+        if (line[0], day_dis) not in user_day_dis:
+            user_day_dis[(line[0], day_dis)] = 1
+        else:
+            user_day_dis[(line[0], day_dis)] += 1
+        if line[3] is not None and line[3] != "null":
+            if (line[3], day_dis) not in coupon_day_dis:
+                coupon_day_dis[(line[3], day_dis)] = 1
+            else:
+                coupon_day_dis[(line[3], day_dis)] += 1
+            if (line[0], line[3], day_dis) not in user_coupon_day_dis:
+                user_coupon_day_dis[(line[0], line[3], day_dis)] = 1
+            else:
+                user_coupon_day_dis[(line[0], line[3], day_dis)] += 1
+        if (line[1], day_dis) not in merchant_day_dis:
+            merchant_day_dis[(line[1], day_dis)] = 1
+        else:
+            merchant_day_dis[(line[1], day_dis)] += 1
+        if (line[0], line[1], day_dis) not in user_merchant_day_dis:
+            user_merchant_day_dis[(line[0], line[1], day_dis)] = 1
+        else:
+            user_merchant_day_dis[(line[0], line[1], day_dis)] += 1
 ############################################offline#############################
 num = 0
 for line in reader_off:
@@ -135,13 +259,13 @@ for line in reader_off:
             user_merchant_off_distance[(line[0], line[1], line[4])] = 1
         else:
             user_merchant_off_distance[(line[0], line[1], line[4])] += 1
-        if line[6] is not None and line[6] != "null":
+        if line[6] is not None and line[6] != "null" and  line[2] is not None and line[2] != "null":
             if (line[0], line[2], line[4]) not in user_coupon_off_distance:
                 user_coupon_off_distance[(line[0], line[2], line[4])] = 1
             else:
                 user_coupon_off_distance[(line[0], line[2], line[4])] += 1
     if (line[5] is not None and line[5] != r"null") and (line[6] is not None and line[6] != r"null"):
-        day_dis = int(line[6][4:6] - line[5][4:6]) * 30 + int(line[6][7:-1] - line[5][7:-1])
+        day_dis = (int(line[6][4:6]) - int(line[5][4:6])) * 30 + (int(line[6][6:]) - int(line[5][6:]))
         if (line[0], day_dis) not in user_off_day_dis:
             user_off_day_dis[(line[0], day_dis)] = 1
         else:
@@ -162,128 +286,6 @@ for line in reader_off:
             user_merchant_off_day_dis[(line[0], line[1], day_dis)] = 1
         else:
             user_merchant_off_day_dis[(line[0], line[1], day_dis)] += 1
-###################################online#############################
-for line in reader_on:
-    num += 1
-    if num == 1:
-        continue
-    if line[3] is not None and line[3] != "null" and line[4] is not None and line[4] == r"null":
-        if ":" not in line[4]:
-            rate = line[4]
-        else:
-            discount = line[4].split(":")
-            rate = float("%.2f" % (float(discount[1]) / float(discount[0])))
-        user_coupon_pair.add((line[0], line[1], line[3], rate, "null"))
-
-    ###########设置交互，click,get,buy (user,coupon,merchant)########
-    if line[6] is not None and line[6] != "null":
-        if (line[0], line[1]) is not None and line[1] != "null":
-            if (line[0], line[1]) not in user_merchant_buy:
-                user_merchant_buy[(line[0], line[1])] = 1
-            else:
-                user_merchant_buy[(line[0], line[1])] += 1
-        if line[0] not in user_buy:
-            user_buy[line[0]] = 1
-        else:
-            user_buy[line[0]] += 1
-        if line[1] not in merchant_buy:
-            merchant_buy[line[1]] = 1
-        else:
-            merchant_buy[line[1]] += 1
-    if line[2] == 0:
-        if line[3] is not None and line[3] != "null":
-            if (line[0], line[3]) not in user_coupon_click:
-                user_coupon_click[(line[0], line[3])] = 1
-            else:
-                user_coupon_click[(line[0], line[3])] += 1
-        if line[1] is not None and line[1] != "null":
-            if (line[0], line[1]) not in user_merchant_click:
-                user_merchant_click[(line[0], line[1])] = 1
-            else:
-                user_merchant_click[(line[0], line[1])] += 1
-        if line[0] not in user_click:
-            user_click[line[0]] = 1
-        else:
-            user_click[line[0]] += 1
-        if line[3] not in coupon_click:
-            coupon_click[line[3]] = 1
-        else:
-            coupon_click[line[3]] += 1
-        if line[1] not in merchant_click:
-            merchant_click[line[1]] = 1
-        else:
-            merchant_click[line[1]] += 1
-    elif line[2] == 1:
-        if line[3] is not None and line[3] != "null":
-            if (line[0], line[3]) not in user_coupon_buy:
-                user_coupon_buy[(line[0], line[3])] = 1
-            else:
-                user_coupon_buy[(line[0], line[3])] += 1
-            if line[3] not in coupon_buy:
-                coupon_buy[line[3]] = 1
-            else:
-                coupon_buy[line[3]] += 1
-    elif line[2] == 2:
-        if line[3] is not None and line[3] != "null":
-            if (line[0], line[3]) not in user_coupon_get:
-                user_coupon_get[(line[0], line[3])] = 1
-            else:
-                user_coupon_get[(line[0], line[3])] += 1
-        if (line[0], line[1]) is not None and line[1] != "null":
-            if (line[0], line[1]) not in user_merchant_get:
-                user_merchant_get[(line[0], line[1])] = 1
-            else:
-                user_merchant_get[(line[0], line[1])] += 1
-        if line[0] not in user_get:
-            user_get[line[0]] = 1
-        else:
-            user_get[line[0]] += 1
-        if line[3] not in coupon_get:
-            coupon_get[line[3]] = 1
-        else:
-            coupon_get[line[3]] += 1
-        if line[1] not in merchant_get:
-            merchant_get[line[1]] = 1
-        else:
-            merchant_get[line[1]] += 1
-            ###########设置优惠力度(user,coupon,merchant)########
-    if line[4] is not None and line[4] != r"null":
-        if ":" not in line[4]:
-            rate = line[4]
-        else:
-            discount = line[4].split(":")
-            rate = float("%.2f" % (float(discount[1]) / float(discount[0])))
-        if (line[3], rate) not in coupon_discount_rate:
-            coupon_discount_rate[(line[3], rate)] = 1
-        else:
-            coupon_discount_rate[(line[3], rate)] += 1
-        if line[6] is not None and line[6] != r"null":
-            if (line[0], line[3], rate) not in user_coupon_discount_rate:
-                user_coupon_discount_rate[(line[0], line[3], rate)] = 1
-            else:
-                user_coupon_discount_rate[(line[0], line[3], rate)] += 1
-    if (line[5] is not None and line[5] != r"null") and (line[6] is not None and line[6] != r"null"):
-        day_dis = int(line[6][4:6] - line[5][4:6]) * 30 + int(line[6][7:-1] - line[5][7:-1])
-        if (line[0], day_dis) not in user_day_dis:
-            user_day_dis[(line[0], day_dis)] = 1
-        else:
-            user_day_dis[(line[0], day_dis)] += 1
-        if (line[3], day_dis) not in coupon_day_dis:
-            coupon_day_dis[(line[3], day_dis)] = 1
-        else:
-            coupon_day_dis[(line[3], day_dis)] += 1
-        if (line[1], day_dis) not in merchant_day_dis:
-            merchant_day_dis[(line[1], day_dis)] = 1
-        else:
-            merchant_day_dis[(line[1], day_dis)] += 1
-        if (line[0], line[3], day_dis) not in user_coupon_day_dis:
-            user_coupon_day_dis[(line[0], line[3], day_dis)] = 1
-        else:
-            user_coupon_day_dis[(line[0], line[3], day_dis)] += 1
-        if (line[0], line[2], day_dis) not in user_merchant_day_dis:
-            user_merchant_day_dis[(line[0], line[2], day_dis)] = 1
-        else:
-            user_merchant_day_dis[(line[0], line[2], day_dis)] += 1
 
 #############################################统计特征##########################
 for k in user_coupon_pair:
