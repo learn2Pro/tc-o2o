@@ -7,6 +7,7 @@ import matplotlib
 import pandas as pd
 import os
 import datetime
+
 matplotlib.use('Agg')
 
 from sklearn.cross_validation import cross_val_score
@@ -98,9 +99,9 @@ print('Read Done!\n')
 users['date'] = users.time.map(lambda x: x.split(' ')[0])
 users['hours'] = users.time.map(lambda x: x.split(' ')[-1])
 users = users.drop(['time'], axis=1)
-users[['behavior_type','time', 'item_category', 'user_geohash']] += '|'
+users[['behavior_type', 'date', 'hours', 'item_category', 'user_geohash']] += '|'
 users = users.groupby(['user_id', 'item_id']).sum().reset_index()
-users.to_csv('users_items_behavior.csv', index=False)
+users.to_csv(os.path.join(os.getcwd(), 'o2o_data', 'users_items_behavior.csv'), index=False, index_label=False)
 print(users.head(5))
 
 train_data_12_18, test_data_12_18 = SplitTrainandTestData(users, '2014-12-18')
@@ -112,7 +113,7 @@ users_test = users.groupby(['user_id', 'item_id']).sum().reset_index()
 print users_test.head(5)
 print users.head(5)
 
-users_test = pd.read_csv(os.path.join(os.getcwd(), 'Data', 'users_items_behavior.csv'))
+users_test = pd.read_csv(os.path.join(os.getcwd(), 'o2o_data', 'users_items_behavior.csv'))
 users_test.loc[:, 'item_category'] = users_test['item_category'].apply(lambda x: x.split('|')[0])
 # users_test.loc[:,'last_day'] = users_test['date'].apply(lambda x: max(x.split('|')))
 users_test.loc[:, 'label'] = users_test[['behavior_type', 'date']].apply(
@@ -146,3 +147,9 @@ users_test = users_test.loc[:, ['user_id', 'item_id']]
 users_test['label'] = y_pred
 predict = users_test[users_test['label'] == 1].drop(['label'], axis=1)
 print predict.head(5)
+submission = pd.DataFrame({
+    "user_id": predict["user_id"],
+    "item_id": predict["item_id"]
+})
+submission.to_csv(os.path.join(os.getcwd(), 'data', 'result.csv'), index=False, index_label=False)
+
